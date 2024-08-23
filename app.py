@@ -2,13 +2,26 @@ from config import *
 
 app = Flask(__name__)
 
+@app.route('/')
+def home():
+    return "Hello, Azhari Bastomi!"
+
 @app.route('/update', methods=['POST'])
 def update_data():
     current_data = ref.get()
     name = request.json.get('name')
     if name in current_data:
-        return jsonify({"message": "Nama sudah ada"}), 400
+        # Update data jika nama sudah ada
+        ref.child(name).update({
+            'activation': request.json.get('activation'),
+            'status': request.json.get('status'),
+            'state': request.json.get('state'),
+            'feed': request.json.get('feed'),
+            'servo': request.json.get('servo')
+        })
+        return jsonify({"message": "Data updated successfully"}), 200
     else:
+        # Tambah data baru jika nama belum ada
         user_data = {
             name: {
                 'activation': request.json.get('activation'),
@@ -19,7 +32,7 @@ def update_data():
             }
         }
         ref.update(user_data)
-        return jsonify({"message": "Data updated successfully"}), 200
+        return jsonify({"message": "Data added successfully"}), 200
 
 @app.route('/search/<name>', methods=['GET'])
 def search(name):
@@ -47,12 +60,14 @@ def delete_data(name):
 def update_(name):
     current_data = ref.get()
     if name in current_data:
-        viariable = request.json.get('variable')
+        variable = request.json.get('variable')
         new_data = request.json.get('new_data')
-        ref.child(name).update({viariable: new_data})
+        ref.child(name).update({variable: new_data})
         return jsonify({"message": "Data updated successfully"}), 200
     else:
         return jsonify({"message": "Data not found"}), 404
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
