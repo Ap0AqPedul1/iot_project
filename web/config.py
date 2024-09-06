@@ -1,12 +1,11 @@
 from flask import Flask, request, jsonify
 import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import db
+from firebase_admin import credentials, db, auth
 
 
-api = 'https://product-iot-eg-default-rtdb.asia-southeast1.firebasedatabase.app/'
+api = 'https://remote-app-cd2d1-default-rtdb.asia-southeast1.firebasedatabase.app/'
 file = 'serviceAccountKey.json'
-key = "component"
+key = "products"
 cred = credentials.Certificate(file)
 firebase_admin.initialize_app(cred, {
     'databaseURL': api

@@ -6,6 +6,41 @@ app = Flask(__name__)
 def home():
     return "Hello, Azhari Bastomi!"
 
+@app.route('/login', methods=['POST'])
+def login_user():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+
+    try:
+        # Login dengan email dan password
+        user = auth.get_user_by_email(email)
+        user_id = user.uid
+        return jsonify({'status': 'success', 'user_id': user_id}), 200
+    except firebase_admin.auth.AuthError as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 400
+
+@app.route('/data', methods=['GET'])
+@app.route('/data/<user_id>', methods=['GET'])
+@app.route('/data/<user_id>/<name>', methods=['GET'])
+def get_data(user_id=None, name=None):
+    try:
+        data = ref.get()
+        if user_id:
+            user_data = data.get(user_id, 'Data tidak ditemukan')
+            if name:
+                list_data = user_data.get(name, 'Data tidak ditemukan')
+                return jsonify(list_data), 200
+            return jsonify(user_data), 200
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({
+            'message': 'Gagal mengambil data',
+            'error': str(e)
+        }), 500
+
+    
+
 @app.route('/update', methods=['POST'])
 def update_data():
     current_data = ref.get()
@@ -41,11 +76,6 @@ def search(name):
         return jsonify(result), 200
     else:
         return jsonify({"message": "Data not found"}), 404
-
-@app.route('/data', methods=['GET'])
-def get_all_data():
-    data = ref.get()
-    return jsonify(data), 200
 
 @app.route('/delete/<name>', methods=['DELETE'])
 def delete_data(name):
