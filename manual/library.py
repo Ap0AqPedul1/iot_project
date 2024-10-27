@@ -56,4 +56,18 @@ def get_name(user_id,name):
         print('Gagal mengambil data:', response.json().get('message'))
         return None
 
+def input_id(user_id,name,id):
+    data = {"new_id": id}
+    print(id)
+    asd = f'{url}/update_id/{user_id}/{name}'
+    data = {
+    'new_id': id
+    }
+
+    # Mengirim permintaan POST
+    response = requests.post(asd, json=data)
+
+    # Menampilkan respons dari server
+    print(response.status_code)
+    print(response.json())
 

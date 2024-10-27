@@ -39,7 +39,27 @@ def get_data(user_id=None, name=None):
             'error': str(e)
         }), 500
 
-    
+@app.route('/update_id/<string:user_id>/<string:name>', methods=['POST'])
+def update_id(user_id, name):
+    # Referensi ke semua produk
+    ref = db.reference('products')
+
+    # Ambil data untuk memeriksa panjang ID
+    data = ref.child(user_id).child(name).get()  # Mengambil data berdasarkan category_id dan item_id
+    if data is None:
+        return jsonify({'error': 'Data tidak ditemukan'}), 404
+
+    current_id = data.get('id')  # Ambil ID saat ini
+
+    # Cek panjang ID
+    if current_id and len(current_id) > 10:  # Pastikan ID tidak None
+        # Update ID
+        new_id = request.json.get('new_id', 'newID123')  # Ambil ID baru dari body permintaan
+        ref.child(user_id).child(name).update({'id': new_id})  # Update ID di lokasi category_id/item_id
+        return jsonify({'message': 'ID berhasil diperbarui.', 'new_id': new_id}), 200
+    else:
+        return jsonify({'message': 'Panjang ID saat ini tidak sama dengan 20, tidak ada pembaruan yang dilakukan.', 'current_id_length': len(current_id) if current_id else 'None'}), 400
+
 
 @app.route('/update', methods=['POST'])
 def update_data():
