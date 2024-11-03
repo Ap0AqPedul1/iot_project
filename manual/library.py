@@ -1,7 +1,7 @@
 import requests
 
 # URL endpoint login Flask
-url = 'http://127.0.0.1:5000/'
+url = 'https://pakanternak.pythonanywhere.com/'
 
 # Data login
 login_data = {
